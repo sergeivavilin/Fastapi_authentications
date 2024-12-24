@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>
+        Welcome, {{user.name}}!
+    </h1>
+    <h2>
+        Your email is: {{user.email}}
+    </h2>
+    <h2>
+        Your picture is: <img src="{{user.picture}}" class="img-thumbnail" alt="picture">
+    </h2>
+    <form action="/logout" method="get">
+        <button type="submit" class="btn btn-primary">logout</button>
+    </form>
+{% endblock %}

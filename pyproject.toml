@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "fastapi-authentications"
+version = "0.1.0"
+description = ""
+authors = ["Sergei <vavilin.dev@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.115.6"
+uvicorn = "^0.34.0"
+python-dotenv = "^1.0.1"
+jinja2 = "^3.1.5"
+itsdangerous = "^2.2.0"
+authlib = "^1.4.0"
+httpx = "^0.28.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
