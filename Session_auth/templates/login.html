@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+{% block template_name %}<h1>Login</h1>{% endblock %}
+{% block content %}
+
+<form action="/login" method="post">
+    <div class="mb-3">
+        <label for="username" class="form-label">Username</label>
+        <input type="text" name="username" id="username" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input type="password" name="password" id="password" class="form-control" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Login</button>
+    <button type="button" class="btn btn-primary" onclick="location.href='/register'">Register</button>
+</form>
+
+{% endblock %}
