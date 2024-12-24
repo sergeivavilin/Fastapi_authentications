@@ -1,4 +1,3 @@
-# Проверка авторизации
 from typing import Annotated
 
 from fastapi import Depends, HTTPException
@@ -10,6 +9,7 @@ from Session_auth.session_app.database import get_db
 from Session_auth.session_app.models import UserSession
 
 
+# Проверка авторизации
 def verify_session(
         request: Request,
         get_db_session: Annotated[Session, Depends(get_db)],

@@ -2,7 +2,9 @@
 {% block title %}Login{% endblock %}
 {% block template_name %}<h1>Login</h1>{% endblock %}
 {% block content %}
-
+{% if message %}
+<h5 class="text-danger">{{ message }}</h5>
+{% endif %}
 <form action="/login" method="post">
     <div class="mb-3">
         <label for="username" class="form-label">Username</label>

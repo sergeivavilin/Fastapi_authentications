@@ -1,8 +1,11 @@
+import os
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
 # Указываем параметры для BD
-SQLALCHEMY_DATABASE_URL = "sqlite:///Session_auth/auth.db"
+
+SQLALCHEMY_DATABASE_URL = f"sqlite:///Session_auth{os.sep}auth.db"
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL, echo=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
