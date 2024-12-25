@@ -1,20 +1,22 @@
 from typing import Annotated
-from hashlib import sha256
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, Form, status
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 
 from sqlalchemy.orm import Session
-from sqlalchemy import select, insert, delete
+from sqlalchemy import select, delete
+
+from hashlib import sha256
+
 from starlette.responses import RedirectResponse
 
 from Session_auth.session_app.database import get_db
-from Session_auth.session_app.models import User, UserSession
-from Session_auth.session_app.tools import verify_session
 
-router = APIRouter(tags=["Session Auth"])
-templates = Jinja2Templates(directory="templates")
+from Session_auth.session_app.models import UserSession, User
+from Session_auth.session_app.tools import templates
+
+router = APIRouter(tags=["Authentication"])
 
 
 # Регистрация
@@ -35,7 +37,7 @@ async def register_user(
 
     if user is not None:
         context={
-            "message": "Chose another username",
+            "message": "User already registered",
             "request": request,
         }
         return templates.TemplateResponse("register.html", context=context)
@@ -66,12 +68,7 @@ async def login_user(
     hashed_password = sha256(password.encode()).hexdigest()
     user: User = get_db_session.scalar(select(User).where(User.username == username))
     if not user or user.password != hashed_password:
-        context={
-            "message": "Invalid username or password",
-            "request": request,
-        }
-        return templates.TemplateResponse("login.html", context=context)
-        # raise HTTPException(status_code=401, detail="Invalid username or password")
+        raise HTTPException(status_code=401, detail="Invalid username or password")
 
     session_token = sha256(f"{username}{password}".encode()).hexdigest()
 
@@ -87,18 +84,13 @@ async def login_user(
     get_db_session.commit()
 
     response.set_cookie("session_token", session_token, httponly=True)
-    return templates.TemplateResponse("welcome.html", {"request": request, "user": user})
+    return templates.TemplateResponse("profile.html", {"request": request, "user": user})
     # return RedirectResponse(url='/profile')
     # return {"message": "Login successful"}
 
 
 # Logout
 @router.get("/logout")
-async def logout_user():
-    return RedirectResponse(url='/login')
-
-
-@router.post("/logout")
 async def logout_user(
         get_db_session: Annotated[Session, Depends(get_db)],
         response: Response,
@@ -110,33 +102,17 @@ async def logout_user(
         get_db_session.commit()
 
     response.delete_cookie("session_token")
-    return RedirectResponse(url='/logout')
-    # return templates.TemplateResponse("login.html", {"request": request})
+    # return RedirectResponse(url='/logout')
+    return templates.TemplateResponse("login.html", {"request": request})
     # return {"message": "Logged out successfully", "deleted_token": session_token}
 
-
-# Пример защищенного маршрута: профиль пользователя
-@router.get("/profile")
-async def profile(
-        response: Response,
-        request: Request,
-        get_db_session: Annotated[Session, Depends(get_db)],
-):
-    user = verify_session(request, get_db_session)
-    return templates.TemplateResponse("profile.html", {"user": user})
-    # return {"id": user.id, "username": user.username}
+# @router.get("/logout")
+# async def logout_user():
+#     return RedirectResponse(url='/login')
 
 
 @router.get("/")
-async def home(request: Request):
+async def home_page(
+        request: Request,
+):
     return templates.TemplateResponse("home.html", {"request": request})
-
-
-# @router.get("/all_users")
-# async def get_all_users(request: Request, get_db_session: Session = Depends(get_db)):
-#     user = verify_session(request, get_db_session)
-#     # TODO: реализовать проверку на администратора
-#     # if user.is_admin:
-#     #     pass
-#     users = get_db_session.scalars(select(User)).all()
-#     return {"users" : users}
