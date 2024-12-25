@@ -17,6 +17,7 @@ httpx = "^0.28.1"
 sqlalchemy = "^2.0.36"
 python-multipart = "^0.0.20"
 alembic = "^1.14.0"
+pyjwt = {extras = ["crypto"], version = "^2.10.1"}
 
 
 [build-system]

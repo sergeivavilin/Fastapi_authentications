@@ -68,7 +68,11 @@ async def login_user(
     hashed_password = sha256(password.encode()).hexdigest()
     user: User = get_db_session.scalar(select(User).where(User.username == username))
     if not user or user.password != hashed_password:
-        raise HTTPException(status_code=401, detail="Invalid username or password")
+        context = {
+            "message": "Invalid username or password",
+            "request": request,
+        }
+        return templates.TemplateResponse("login.html", context=context)
 
     session_token = sha256(f"{username}{password}".encode()).hexdigest()
 
