@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, Form, status
-from fastapi.templating import Jinja2Templates
+
 from fastapi.responses import HTMLResponse
 
 from sqlalchemy.orm import Session
@@ -9,20 +9,21 @@ from sqlalchemy import select, delete
 
 from hashlib import sha256
 
+from starlette.middleware.sessions import SessionMiddleware
 from starlette.responses import RedirectResponse
 
 from Session_auth.session_app.database import get_db
 
 from Session_auth.session_app.models import UserSession, User
+from Session_auth.session_app.session_router import MAX_SESSIONS_LIFETIME
 from Session_auth.session_app.tools import templates
 
 router = APIRouter(tags=["Authentication"])
 
-
 # Регистрация
 @router.get("/register", response_class=HTMLResponse)
 async def register_page(request: Request):
-    return templates.TemplateResponse("register.html", {"request": request})
+    return templates.TemplateResponse(request=request, name="register.html")
 
 
 @router.post("/register")
@@ -35,24 +36,26 @@ async def register_user(
     hashed_password = sha256(password.encode()).hexdigest()
     user = get_db_session.scalar(select(User).where(User.username == username))
 
-    if user is not None:
+    if user:
         context={
-            "message": "User already registered",
-            "request": request,
+            "message": "Choose another username",
         }
-        return templates.TemplateResponse("register.html", context=context)
+        return templates.TemplateResponse(request=request, name="register.html", context=context)
 
     get_db_session.add(User(username=username, password=hashed_password))
     get_db_session.commit()
 
-    # return {"message": "User registered successfully"}
-    return RedirectResponse(url='/profile')
+    context = {
+        "message": "You were registered! Please login"
+    }
+
+    return templates.TemplateResponse(request=request, name="login.html", context=context)
 
 
 # Логин
 @router.get("/login", response_class=HTMLResponse)
 async def login_page(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request})
+    return templates.TemplateResponse(request=request, name="login.html")
 
 
 @router.post("/login")
@@ -70,15 +73,15 @@ async def login_user(
     if not user or user.password != hashed_password:
         context = {
             "message": "Invalid username or password",
-            "request": request,
         }
-        return templates.TemplateResponse("login.html", context=context)
+        return templates.TemplateResponse(request=request, name="login.html", context=context)
 
     session_token = sha256(f"{username}{password}".encode()).hexdigest()
 
     # Удаляем старые сессии пользователя из DB
     try:
         get_db_session.execute(delete(UserSession).where(UserSession.user_id == user.id))
+        get_db_session.commit()
     except AttributeError as e:
         print(e)
 
@@ -87,8 +90,18 @@ async def login_user(
     get_db_session.add(new_session)
     get_db_session.commit()
 
-    response.set_cookie("session_token", session_token, httponly=True)
-    return templates.TemplateResponse("profile.html", {"request": request, "user": user})
+
+    # response.set_cookie("session_token", session_token, httponly=True)
+    response = templates.TemplateResponse(request=request, name="profile.html", context={"user": user})
+    response.set_cookie(
+        key="session_token",
+        value=session_token,
+        httponly=True,  # Ограничиваем доступ к cookie только через HTTP (не через JS)
+        max_age=MAX_SESSIONS_LIFETIME,  # Время жизни куки
+        samesite="lax",  # Политика SameSite для защиты от CSRF
+        secure=False  # Установить True для HTTPS
+    )
+    return response
     # return RedirectResponse(url='/profile')
     # return {"message": "Login successful"}
 
@@ -104,10 +117,10 @@ async def logout_user(
     if session_token:
         get_db_session.execute(delete(UserSession).where(UserSession.session_token == session_token))
         get_db_session.commit()
-
-    response.delete_cookie("session_token")
-    # return RedirectResponse(url='/logout')
-    return templates.TemplateResponse("login.html", {"request": request})
+    request.session.clear()
+    # response.delete_cookie("session_token")
+    return RedirectResponse(url='/')
+    # return templates.TemplateResponse(request=request, name="login.html")
     # return {"message": "Logged out successfully", "deleted_token": session_token}
 
 # @router.get("/logout")
@@ -119,4 +132,4 @@ async def logout_user(
 async def home_page(
         request: Request,
 ):
-    return templates.TemplateResponse("home.html", {"request": request})
+    return templates.TemplateResponse(request=request, name="home.html")

@@ -1,10 +1,9 @@
-from lib2to3.fixes.fix_input import context
-from typing import Annotated
+from typing import Annotated, Optional
 
-from fastapi import APIRouter, Request, HTTPException, Depends
+from fastapi import APIRouter, Request, HTTPException, Depends, Cookie
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-from starlette.responses import Response
+from starlette.responses import Response, RedirectResponse
 
 from Session_auth.session_app.database import get_db
 
@@ -16,10 +15,10 @@ router = APIRouter(tags=["Protected"])
 
 # Проверка авторизации
 def verify_session(
-        request: Request,
         get_db_session: Annotated[Session, Depends(get_db)],
+        session_token: Optional[str] = Cookie(None),
 ):
-    session_token = request.cookies.get("session_token")
+
     if not session_token:
         raise HTTPException(status_code=401, detail="Unauthorized")
 
@@ -32,34 +31,38 @@ def verify_session(
 # Пример защищенного маршрута: профиль пользователя
 @router.get("/profile")
 async def profile(
-        response: Response,
         request: Request,
         get_db_session: Annotated[Session, Depends(get_db)],
+        session_token: Optional[str] = Cookie(alias="session_token"),
 ):
     try:
-        user = verify_session(request, get_db_session)
+        user = verify_session(get_db_session, session_token)
     except HTTPException:
         return templates.TemplateResponse(
-            "profile.html",
+            request=request,
+            name="profile.html",
             context={
                 "error_message": "Login into your account",
-                "request": request
             }
         )
-    return templates.TemplateResponse("profile.html", {"user": user, "request": request})
+    return templates.TemplateResponse(request=request, name="profile.html", context={"user": user})
     # return {"id": user.id, "username": user.username}
 
 
 @router.get("/all_users")
-async def get_all_users(request: Request, get_db_session: Session = Depends(get_db)):
+async def get_all_users(
+        request: Request,
+        get_db_session: Session = Depends(get_db)
+):
+    session_token = request.cookies.get("session_token")
     try:
-        admin = verify_session(request, get_db_session)
+        admin = verify_session(get_db_session, session_token)
     except HTTPException:
         return templates.TemplateResponse(
-            "all_users.html",
+            request=request,
+            name="all_users.html",
             context={
                 "error_message": "Login into admin account",
-                "request": request
             }
         )
     # TODO: реализовать проверку на администратора
@@ -68,7 +71,5 @@ async def get_all_users(request: Request, get_db_session: Session = Depends(get_
     users = get_db_session.scalars(select(User)).all()
     context = {
         "users": users,
-        "request": request,
-        "admin": admin
     }
-    return templates.TemplateResponse("all_users.html", context)
+    return templates.TemplateResponse(request=request, name="all_users.html", context=context)

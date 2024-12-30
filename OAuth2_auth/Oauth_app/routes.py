@@ -17,7 +17,7 @@ async def homepage(request: Request):
     user = request.session.get('user')
     if user:
         return RedirectResponse(url='/protected')
-    # return HTMLResponse('<a href="/login">login</a>')
+
     return templates.TemplateResponse(request, "home.html")
 
 @router.get("/login")
@@ -41,8 +41,9 @@ async def auth(request: Request):
         return HTMLResponse(f'<h1>{error.error}</h1>')
 
     user = token.get('userinfo')
+    print(user)
     if user:
-        request.session['user'] = dict(user)
+        request.session['user'] = user
     return RedirectResponse(url='/')
 
 @router.get('/logout')
