@@ -16,7 +16,7 @@ from Session_auth.session_app.database import get_db
 
 from Session_auth.session_app.models import UserSession, User
 from Session_auth.session_app.session_router import MAX_SESSIONS_LIFETIME
-from Session_auth.session_app.tools import templates
+from Session_auth.session_app.tools import templates, generate_session_token
 
 router = APIRouter(tags=["Authentication"])
 
@@ -76,7 +76,7 @@ async def login_user(
         }
         return templates.TemplateResponse(request=request, name="login.html", context=context)
 
-    session_token = sha256(f"{username}{password}".encode()).hexdigest()
+    session_token = generate_session_token()
 
     # Удаляем старые сессии пользователя из DB
     try:
@@ -114,11 +114,13 @@ async def logout_user(
         request: Request,
 ):
     session_token = request.cookies.get("session_token")
+    print(session_token)
     if session_token:
         get_db_session.execute(delete(UserSession).where(UserSession.session_token == session_token))
         get_db_session.commit()
-    request.session.clear()
-    # response.delete_cookie("session_token")
+
+    # request.session.clear()
+    response.delete_cookie(key="session_token")
     return RedirectResponse(url='/')
     # return templates.TemplateResponse(request=request, name="login.html")
     # return {"message": "Logged out successfully", "deleted_token": session_token}
