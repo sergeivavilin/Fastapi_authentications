@@ -24,7 +24,7 @@ if __name__ == '__main__':
     # uvicorn.run(
     #     app='JWT_auth.main:JWT_app',
     #     host="127.0.0.1",
-    #     port=8002,
+    #     port=8001,
     #     reload=True
     # )
 
@@ -34,6 +34,6 @@ if __name__ == '__main__':
     uvicorn.run(
         app='OAuth2_auth.main:oauth2_app',
         host='localhost',
-        port=8001,
+        port=8002,
         reload=True,
     )

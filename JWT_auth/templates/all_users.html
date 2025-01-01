@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}All Users{% endblock %}
+{% block template_name %}<h1>All Users</h1>{% endblock %}
+
+{% block content %}
+{% if error_message %}
+<h5 class="text-danger">{{ error_message }}</h5>
+<div class="mt-4">
+    <a href="/login" class="btn btn-danger">Login</a>
+</div>
+{% else %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header text-center">Welcome Admin!</div>
+            <div class="card-body">
+                <ul class="list-group">
+                    {% for user in users %}
+                    <li class="list-group-item">Username:{{ user.username }} | ID:{{ user.id }}</li>
+                    {% endfor %}
+                </ul>
+                <div class="mt-4">
+                    <a href="/logout" class="btn btn-danger">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+

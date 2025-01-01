@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Registration{% endblock %}
+{% block template_name %}<h1>Registration</h1>{% endblock %}
+{% block content %}
+{% if message %}
+<h5 class="text-danger">{{ message }}</h5>
+{% endif %}
+<form action="/register" method="post">
+    <div class="mb-3">
+        <label for="username" class="form-label">Username</label>
+        <input type="text" name="username" id="username" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input type="password" name="password" id="password" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+</form>
+
+<div class="mb-3">
+    <button type="button" class="btn btn-primary" onclick="location.href='/login'">Sigh in</button>
+</div>
+
+{% endblock %}
+

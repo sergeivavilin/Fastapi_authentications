@@ -15,8 +15,7 @@ from starlette.responses import RedirectResponse
 from Session_auth.session_app.database import get_db
 
 from Session_auth.session_app.models import UserSession, User
-from Session_auth.session_app.session_router import MAX_SESSIONS_LIFETIME
-from Session_auth.session_app.tools import templates, generate_session_token
+from Session_auth.session_app.tools import templates, generate_session_token, MAX_SESSIONS_LIFETIME
 
 router = APIRouter(tags=["Authentication"])
 
