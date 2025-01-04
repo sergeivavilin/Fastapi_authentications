@@ -42,7 +42,7 @@ async def profile(
             request=request,
             name="profile.html",
             context={
-                "error_message": "Login into your account",
+                "error_message": "Login to your account",
             }
         )
     return templates.TemplateResponse(request=request, name="profile.html", context={"user": user})
@@ -62,7 +62,7 @@ async def get_all_users(
             request=request,
             name="all_users.html",
             context={
-                "error_message": "Login into admin account",
+                "error_message": "Login to admin account",
             }
         )
     # TODO: реализовать проверку на администратора

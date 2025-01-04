@@ -8,15 +8,15 @@
 <div class="mt-4">
     <a href="/login" class="btn btn-danger">Login</a>
 </div>
-{% elif user %}
+{% elif (username and user_id) %}
 <div class="row justify-content-center">
     <div class="col-md-8">
         <div class="card">
-            <div class="card-header text-center">Welcome {{ user.username }}!</div>
+            <div class="card-header text-center">Welcome {{ username }}!</div>
             <div class="card-body">
                 <ul class="list-group">
-                    <li class="list-group-item">Username: {{ user.username }}</li>
-                    <li class="list-group-item">ID: {{ user.id }}</li>
+                    <li class="list-group-item">Username: {{ username }}</li>
+                    <li class="list-group-item">ID: {{ user_id }}</li>
                 </ul>
                 <div class="mt-4">
                     <a href="/logout" class="btn btn-danger">Logout</a>

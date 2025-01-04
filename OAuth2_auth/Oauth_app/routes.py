@@ -25,8 +25,7 @@ async def login(request: Request):
     user = request.session.get('user')
     if user:
         return RedirectResponse(url='/')
-    # absolute url for callback
-    #
+
     redirect_uri = request.url_for('auth')
     return await oauth_exemple.google.authorize_redirect(request, redirect_uri)
 
@@ -41,7 +40,7 @@ async def auth(request: Request):
         return HTMLResponse(f'<h1>{error.error}</h1>')
 
     user = token.get('userinfo')
-    print(user)
+
     if user:
         request.session['user'] = user
     return RedirectResponse(url='/')
