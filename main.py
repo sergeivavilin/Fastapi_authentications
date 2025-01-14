@@ -1,10 +1,10 @@
 import uvicorn
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     """
-    Запуск приложений необходимо осуществлять по отдельности 
-    Для запуска конкретного приложения раскомментируйте блок 
+    Запуск приложений необходимо осуществлять по отдельности
+    Для запуска конкретного приложения раскомментируйте блок
     в дальнейшем можно будет запускать через Docker образы и docker-compose
     """
 
@@ -35,8 +35,8 @@ if __name__ == '__main__':
     """
 
     uvicorn.run(
-        app='OAuth2_auth.main:oauth2_app',
-        host='localhost',
+        app="OAuth2_auth.main:oauth2_app",
+        host="localhost",
         port=8002,
         reload=True,
     )

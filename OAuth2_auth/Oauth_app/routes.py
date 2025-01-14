@@ -1,12 +1,10 @@
 from authlib.integrations.base_client import OAuthError
-
 from fastapi import APIRouter
 from starlette.requests import Request
 from starlette.responses import RedirectResponse, HTMLResponse
 from starlette.templating import Jinja2Templates
 
 from OAuth2_auth.Oauth_app.tools import oauth_exemple
-
 
 router = APIRouter()
 

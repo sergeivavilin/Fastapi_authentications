@@ -12,4 +12,3 @@ oauth_exemple.register(
         'scope': 'openid email profile'
     }
 )
-

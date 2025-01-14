@@ -6,14 +6,12 @@ from typing import Optional, Annotated
 import jwt
 from fastapi import Depends, HTTPException, Form
 from fastapi.params import Cookie
-
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from starlette.templating import Jinja2Templates
 
 from Session_auth.session_app.database import get_db
 from Session_auth.session_app.models import User
-
 
 JWT_ERROR = jwt.PyJWTError
 JWT_SECRET_KEY = "JWT_SECRET_KEY"
