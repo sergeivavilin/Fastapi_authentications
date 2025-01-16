@@ -2,6 +2,7 @@ from authlib.integrations.starlette_client import OAuth
 
 from OAuth2_auth.Oauth_app.config import CLIENT_ID, CLIENT_SECRET
 
+
 oauth_exemple = OAuth()
 oauth_exemple.register(
     name="google",

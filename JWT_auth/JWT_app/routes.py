@@ -22,6 +22,11 @@ router = APIRouter(tags=["JWT auth"])
 
 @router.get("/login")
 async def login(request: Request):
+    """
+    GET-Роутер для получения страницы логина
+    :param request: Параметры запроса
+    :return: HTML Страница логина
+    """
     return templates.TemplateResponse("login.html", {"request": request})
 
 
@@ -31,6 +36,15 @@ async def login_for_jwt(
     request: Request,
     user: User = Depends(validate_user),
 ):
+    """
+    POST-Роутер для логина с JWT
+    При неверных данных возвращаем страницу логина с ошибкой,
+    Если пользователь правильно ввел данные, то создаем новый JWT токен и возвращаем страницу профиля
+    :param request: Параметры запроса
+    :param user: Пользователь полученный из БД
+    :return: RedirectResponse
+    """
+
     if not user:
         context = {
             "message": "Invalid username or password",
@@ -59,9 +73,14 @@ async def login_for_jwt(
 
 @router.get("/profile")
 async def get_profile(
-    request: Request,
-    # access_jwt_token: Optional[str] = Cookie(alias="access_jwt_token")
+    request: Request
 ):
+    """
+    GET-Роутер для получения страницы профиля
+    :param request: Параметры запроса
+    :return: RedirectResponse
+    """
+    # Проверяем есть ли токен в куках
     token = request.cookies.get("access_jwt_token")
     if not token:
         return templates.TemplateResponse(
@@ -71,7 +90,7 @@ async def get_profile(
                 "error_message": "Login to your account",
             },
         )
-
+    # Проверяем токен на валидность и получаем данные из него
     try:
         valid_payload = verify_access_token(token)
     except HTTPException:
@@ -96,6 +115,14 @@ async def get_all_users(
     request: Request,
     users: list[User] = Depends(get_all_users_from_db),
 ):
+    """
+    GET-Роутер для получения страницы со всеми пользователями
+    Роутер доступен только для пользователя admin, проверка осуществляется с помощью
+    зависимости get_all_users_from_db
+    :param request: Параметры запроса
+    :param users: Список пользователей
+    :return: HTML-страница со всеми пользователями
+    """
     token = request.cookies.get("access_jwt_token")
     if not token:
         context = {
@@ -133,12 +160,12 @@ async def get_all_users(
 
 # Logout
 @router.get("/logout")
-async def logout_user(
-    response: Response,
-    request: Request,
-):
+async def logout_user():
+    """
+    GET-Роутер для выхода из аккаунта
+    :return: RedirectResponse
+    """
     response = RedirectResponse(url="/login")
-    # response.set_cookie(key="access_jwt_token", value="", httponly=True, max_age=10)
     response.delete_cookie(key="access_jwt_token")
     return response
 
@@ -146,6 +173,11 @@ async def logout_user(
 # Регистрация
 @router.get("/register")
 async def register_page(request: Request):
+    """
+    GET-Роутер для получения страницы регистрации
+    :param request: Параметры запроса
+    :return: HTML-страница регистрации
+    """
     return templates.TemplateResponse(request=request, name="register.html")
 
 
@@ -156,6 +188,15 @@ async def register_user(
     username: str = Form(),  # Извлекаем username из данных формы
     password: str = Form(),  # Извлекаем password из данных формы
 ):
+    """
+    POST-Роутер для регистрации пользователя
+
+    :param request: Параметры запроса
+    :param get_db_session: ORM-сессия для работы с БД
+    :param username: Имя пользователя
+    :param password: Пароль пользователя
+    :return:
+    """
     user = get_db_session.scalar(select(User).where(User.username == username))
     if user:
         context = {
@@ -171,8 +212,19 @@ async def register_user(
         return templates.TemplateResponse(
             request=request, name="login.html", context=context
         )
+    else:
+        context = {"message": "Your registration was failed! Please try again"}
+        print(f"Error with registration {username}")
+        return templates.TemplateResponse(
+            request=request, name="register.html", context=context
+        )
 
 
 @router.get("/")
 async def get_home_page(request: Request):
+    """
+    GET-Роутер для получения главной страницы
+    :param request: Параметры запроса
+    :return: HTML-шаблон главной страницы
+    """
     return templates.TemplateResponse(request=request, name="home.html")

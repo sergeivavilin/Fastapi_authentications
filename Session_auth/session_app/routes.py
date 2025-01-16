@@ -15,12 +15,18 @@ from Session_auth.session_app.tools import (
     MAX_SESSIONS_LIFETIME,
 )
 
+# Создаем роутер для аутентификации
 router = APIRouter(tags=["Authentication"])
 
 
 # Регистрация
 @router.get("/register", response_class=HTMLResponse)
 async def register_page(request: Request):
+    """
+    GET-Роутер для получения страницы регистрации
+    :param request: Параметры запроса
+    :return: HTML-страница регистрации
+    """
     return templates.TemplateResponse(request=request, name="register.html")
 
 
@@ -28,9 +34,20 @@ async def register_page(request: Request):
 async def register_user(
     request: Request,
     get_db_session: Annotated[Session, Depends(get_db)],
-    username: str = Form(),  # Извлекаем username из данных формы
-    password: str = Form(),  # Извлекаем password из данных формы
+    username: str = Form(),
+    password: str = Form(),
 ):
+    """
+    POST-Роутер для регистрации пользователя
+    Если юзер уже зарегистрирован, то возвращаем страницу регистрации
+    Если юзер не зарегистрирован, то сохраняем его в БД и возвращаем страницу логина
+
+    :param request:  Параметры запроса
+    :param get_db_session: ORM-сессия подключения к БД
+    :param username: username из данных формы
+    :param password: password из данных формы
+    :return: HTML-страница регистрации
+    """
     hashed_password = sha256(password.encode()).hexdigest()
 
     # Проверяем наличие ученых данных
@@ -56,18 +73,33 @@ async def register_user(
 # Логин
 @router.get("/login", response_class=HTMLResponse)
 async def login_page(request: Request):
+    """
+    GET-Роутер для получения страницы логина
+    :param request: Параметры запроса
+    :return: HTML-страница логина
+    """
     return templates.TemplateResponse(request=request, name="login.html")
 
 
 @router.post("/login")
 async def login_user(
     get_db_session: Annotated[Session, Depends(get_db)],
-    response: Response,
     request: Request,
     # Извлекаем данные из формы
     username: str = Form(),
     password: str = Form(),
 ):
+    """
+    POST-Роутер для логина пользователя.
+    При неверных данных возвращаем страницу логина с ошибкой,
+    Если пользователь правильно ввел данные, то создаем новый сессионный токен в БД и возвращаем страницу профиля
+    :param get_db_session: ORM-сессия подключения к БД
+    :param request: Параметры запроса
+    :param username: username из данных формы
+    :param password: password из данных формы
+    :return: HTML-страница профиля
+    """
+
     hashed_password = sha256(password.encode()).hexdigest()
 
     # Валидируем пользователя
@@ -97,9 +129,7 @@ async def login_user(
     get_db_session.add(new_session)
     get_db_session.commit()
 
-    # Устанавливаем токен в куки
-
-    # response.set_cookie("session_token", session_token, httponly=True)
+    # Создаем шаблон ответа и устанавливаем токен в куки
     response = templates.TemplateResponse(
         request=request, name="profile.html", context={"user": user}
     )
@@ -121,6 +151,14 @@ async def logout_user(
     response: Response,
     request: Request,
 ):
+    """
+    GET-Роутер для выхода из аккаунта
+    Удаляем токен из БД и удаляем его из куки пользователя и переадресовываем на главную страницу
+    :param get_db_session: ORM-сессия подключения к БД
+    :param response: Ответ
+    :param request: Параметры запроса
+    :return: Главная HTML-страница
+    """
     # Запрашиваем токен из куки
     session_token = request.cookies.get("session_token")
 
@@ -139,4 +177,9 @@ async def logout_user(
 async def home_page(
     request: Request,
 ):
+    """
+    GET-Роутер для получения главной страницы
+    :param request: Параметры запроса
+    :return: HTML-страница главной страницы
+    """
     return templates.TemplateResponse(request=request, name="home.html")

@@ -34,9 +34,9 @@ if __name__ == "__main__":
     Oauth2 authentication приложение
     """
 
-    uvicorn.run(
-        app="OAuth2_auth.main:oauth2_app",
-        host="localhost",
-        port=8002,
-        reload=True,
-    )
+    # uvicorn.run(
+    #     app="OAuth2_auth.main:oauth2_app",
+    #     host="localhost",
+    #     port=8002,
+    #     reload=True,
+    # )

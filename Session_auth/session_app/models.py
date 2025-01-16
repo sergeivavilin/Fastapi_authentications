@@ -5,6 +5,9 @@ from Session_auth.session_app.database import Base
 
 
 class User(Base):
+    """
+    Базовая модель пользователя
+    """
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -16,6 +19,9 @@ class User(Base):
 
 
 class UserSession(Base):
+    """
+    Модель сессии пользователя
+    """
     __tablename__ = "user_sessions"
 
     id = Column(Integer, primary_key=True, index=True)

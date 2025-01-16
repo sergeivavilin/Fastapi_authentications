@@ -17,6 +17,15 @@ def verify_session(
     get_db_session: Annotated[Session, Depends(get_db)],
     session_token: Optional[str] = Cookie(None),
 ):
+    """
+    Проверка сессионного токена пользователя.
+    Если сессионный токен не найден или не валиден, то возвращается ошибка 401.
+    Если сессионный токен валиден, то возвращается пользователь из БД.
+
+    :param get_db_session: ORM-сессия подключения к БД
+    :param session_token: сессионный токен пользователя
+    :return: пользователь из БД
+    """
 
     if not session_token:
         raise HTTPException(status_code=401, detail="Unauthorized")
@@ -29,13 +38,22 @@ def verify_session(
     return session.user
 
 
-# Пример защищенного маршрута: профиль пользователя
 @router.get("/profile")
 async def profile(
     request: Request,
     get_db_session: Annotated[Session, Depends(get_db)],
     session_token: Optional[str] = Cookie(alias="session_token"),
 ):
+    """
+    Пример защищенного маршрута: профиль пользователя.
+    Если пользователь не авторизован, то возвращается ошибка 401.
+    Если пользователь авторизован, то возвращается шаблон с профилем пользователя.
+
+    :param request: Параметры запроса
+    :param get_db_session: ORM-сессия подключения к БД
+    :param session_token: сессионный токен пользователя
+    :return: HTML-страница с профилем пользователя
+    """
     try:
         user = verify_session(get_db_session, session_token)
     except HTTPException:
@@ -49,7 +67,7 @@ async def profile(
     return templates.TemplateResponse(
         request=request, name="profile.html", context={"user": user}
     )
-    # return {"id": user.id, "username": user.username}
+
 
 
 @router.get("/all_users")

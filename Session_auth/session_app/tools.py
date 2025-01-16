@@ -12,6 +12,7 @@ from Session_auth.db_config import BASE_DIR
 from Session_auth.session_app.database import get_db
 from Session_auth.session_app.models import UserSession
 
+
 # Базовый путь к шаблонам
 templates = Jinja2Templates(directory=f"{BASE_DIR}{os.sep}templates")
 
@@ -21,6 +22,10 @@ MAX_SESSIONS_LIFETIME = 360  #
 
 # Хелпер для генерации токена сессии
 def generate_session_token() -> str:
+    """
+    Генерация токена сессии для пользователя
+    :return: токен сессии
+    """
     token = secrets.token_hex(16)
     return token
 
@@ -30,6 +35,13 @@ def get_verify_session(
     session_token: str,
     get_db_session: Annotated[Session, Depends(get_db)],
 ):
+    """
+    Проверка сессии пользователя
+
+    :param session_token: токен сессии
+    :param get_db_session: ORM-сессия подключения к БД
+    :return: пользователь из БД
+    """
     if not session_token:
         raise HTTPException(status_code=401, detail="Unauthorized")
 
