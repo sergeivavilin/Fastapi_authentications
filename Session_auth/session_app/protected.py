@@ -69,7 +69,6 @@ async def profile(
     )
 
 
-
 @router.get("/all_users")
 async def get_all_users(request: Request, get_db_session: Session = Depends(get_db)):
     session_token = request.cookies.get("session_token")

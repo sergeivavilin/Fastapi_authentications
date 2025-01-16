@@ -13,7 +13,6 @@ from starlette.templating import Jinja2Templates
 from Session_auth.session_app.database import get_db
 from Session_auth.session_app.models import User
 
-
 # Настройки для шифрования токена
 JWT_ERROR = jwt.PyJWTError
 JWT_SECRET_KEY = "JWT_SECRET_KEY"

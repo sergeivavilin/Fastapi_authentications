@@ -12,7 +12,6 @@ from Session_auth.db_config import BASE_DIR
 from Session_auth.session_app.database import get_db
 from Session_auth.session_app.models import UserSession
 
-
 # Базовый путь к шаблонам
 templates = Jinja2Templates(directory=f"{BASE_DIR}{os.sep}templates")
 

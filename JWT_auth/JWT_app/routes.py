@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Form
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from starlette.requests import Request
-from starlette.responses import RedirectResponse, Response
+from starlette.responses import RedirectResponse
 
 from JWT_auth.JWT_app.tools import (
     create_access_token,
@@ -72,9 +72,7 @@ async def login_for_jwt(
 
 
 @router.get("/profile")
-async def get_profile(
-    request: Request
-):
+async def get_profile(request: Request):
     """
     GET-Роутер для получения страницы профиля
     :param request: Параметры запроса

@@ -2,7 +2,6 @@ from fastapi import FastAPI
 
 from JWT_auth.JWT_app import routes
 
-
 # Создаем экземпляр приложения
 JWT_app = FastAPI()
 

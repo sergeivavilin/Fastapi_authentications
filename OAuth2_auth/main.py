@@ -3,7 +3,6 @@ from starlette.middleware.sessions import SessionMiddleware
 
 from OAuth2_auth.Oauth_app.routes import router
 
-
 # Создаем приложение для OAauth2 аутентификации
 oauth2_app = FastAPI()
 
