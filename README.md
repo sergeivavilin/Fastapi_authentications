@@ -86,7 +86,7 @@ Fastapi_authentications/
 
 1. **Клонируйте репозиторий:**
    ```bash
-   git clone https://github.com/username/Fastapi_authentications.git
+   git clone https://github.com/sergeivavilin/Fastapi_authentications.git
    cd Fastapi_authentications
    ```
     
